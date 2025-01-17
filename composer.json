@@ -1,0 +1,30 @@
+{
+    "name": "bagisto/graphql-api",
+    "description": "Bagisto GraphQL API",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vivek Sharma",
+            "email": "viveksh047@webkul.in"
+        }
+    ],
+    "require": {
+        "php-open-source-saver/jwt-auth": "^2.1",
+        "nuwave/lighthouse": "^6.23",
+        "mll-lab/laravel-graphiql": "^3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkul\\GraphQLAPI\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\GraphQLAPI\\Providers\\GraphQLAPIServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "minimum-stability": "dev"
+}

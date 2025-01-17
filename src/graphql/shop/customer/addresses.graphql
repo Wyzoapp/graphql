@@ -1,0 +1,46 @@
+#Shop\Customer\Address Related APIs
+extend type Query @guard(with: ["api"]){
+    addresses (
+        input: FilterCustomerAddressInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Customer\\AddressesQuery")
+    ): [Address!] @paginate(
+        type: "PAGINATOR"
+        model: "Wyzo\\Customer\\Models\\CustomerAddress"
+        defaultCount: 10
+    )
+
+    address (
+        id: ID @eq
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Customer\\AddressesQuery@getAddress")
+    ): Address @find(model: "Wyzo\\Customer\\Models\\CustomerAddress")
+}
+
+extend type Mutation @guard(with: ["api"]) {
+    createAddress(
+        input: AddressInput! @spread
+    ): AddressResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\AddressesMutation@store")
+
+    updateAddress(
+        id: ID!,
+        input: AddressInput! @spread
+    ): AddressResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\AddressesMutation@update")
+
+    setDefaultAddress(id: ID!): AddressResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\AddressesMutation@setDefaultAddress")
+
+    deleteAddress(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\AddressesMutation@delete")
+}
+
+input AddressInput {
+    companyName: String @rename(attribute: "company_name")
+    firstName: String! @rename(attribute: "first_name")
+    lastName: String! @rename(attribute: "last_name")
+    email: String!
+    vatId: String @rename(attribute: "vat_id")
+    address: [String]!
+    country: String!
+    state: String!
+    city: String!
+    postcode: String!
+    phone: String!
+    defaultAddress: Boolean @rename(attribute: "default_address")
+}

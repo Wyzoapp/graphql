@@ -1,0 +1,16 @@
+# Shop\Checkout\Addresses Related API
+extend type Query {
+    checkoutAddresses: CheckoutAddresses @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CheckoutMutation@addresses")
+}
+
+type CheckoutAddresses {
+    isGuest: Boolean @rename(attribute: "is_guest")
+    customer: Customer
+    addresses: [FormattedAddresses]
+    defaultCountry: String @rename(attribute: "default_country")
+}
+
+type FormattedAddresses {
+    id: Int
+    address: String
+}

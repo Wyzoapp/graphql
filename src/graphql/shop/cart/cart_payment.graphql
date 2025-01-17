@@ -1,0 +1,19 @@
+# Shop\Cart\CartPayment Related APIs
+extend type Query {
+    cartPayments: [CartPayment!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Checkout\\Models\\CartPayment"
+    )
+
+    cartPayment(id: ID @eq): CartPayment @find(model: "Wyzo\\Checkout\\Models\\CartPayment")
+}
+
+type CartPayment {
+    id: ID!
+    method: String!
+    methodTitle: String @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Customer\\OrderQuery@getOrderPaymentTitle")
+    cartId: ID! @rename(attribute: "cart_id")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+}

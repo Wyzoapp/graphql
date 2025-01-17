@@ -1,0 +1,116 @@
+# Setting\Theme Related APIs
+extend type Query{
+    themes(
+        input: FilterThemesInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\Setting\\FilterTheme")
+    ): [Theme!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Theme\\Models\\ThemeCustomization"
+    )
+
+    theme(id: ID @eq): Theme @find(model: "Wyzo\\Theme\\Models\\ThemeCustomization")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createTheme(
+        input: CreateThemeInput! @spread
+    ): ThemeResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\ThemeMutation@store")
+
+    updateTheme(
+        id: ID!,
+        input: UpdateThemeInput! @spread
+    ): ThemeResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\ThemeMutation@update")
+
+    deleteTheme(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\ThemeMutation@delete")
+}
+
+input FilterThemesInput {
+    id: ID
+}
+
+input CreateThemeInput {
+    name: String
+    sortOrder: Int @rename(attribute: "sort_order")
+    type: ThemeType
+    channelId: ID @rename(attribute: "channel_id")
+    themeCode: String @rename(attribute: "theme_code")
+}
+
+enum ThemeType {
+    ProductCarousel @enum(value: "product_carousel")
+    CategoryCarousel @enum(value: "category_carousel")
+    StaticContent @enum(value: "static_content")
+    ImageCarousel @enum(value: "image_carousel")
+    FooterLinks @enum(value: "footer_links")
+    ServicesContent @enum(value: "services_content")
+}
+
+input UpdateThemeInput {
+    name: String
+    sortOrder: Int @rename(attribute: "sort_order")
+    channelId: ID @rename(attribute: "channel_id")
+    status: Boolean
+    themeCode: String @rename(attribute: "theme_code")
+    options: OptionInputTheme!
+}
+
+input OptionInputTheme {
+    title: String
+    filtersInput: [FilterInput]
+}
+
+input FilterInput {
+    key: String
+    value: String
+}
+
+type ThemeResponse {
+    success: Boolean
+    message: String
+    theme: Theme
+}
+
+type Theme {
+    id: ID!
+    themeCode: String @rename(attribute: "theme_code")
+    type: String
+    name: String
+    sortOrder: Int  @rename(attribute: "sort_order")
+    status: Boolean
+    channelId: ID @rename(attribute: "channel_id")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    translations: [ThemeTranslation!] @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Admin\\Setting\\ThemeContent@getThemeTranslations")
+}
+
+type ThemeTranslation {
+    id: ID!
+    themeCustomizationId: Int! @rename(attribute: "theme_customization_id")
+    localeCode: String! @rename(attribute: "locale")
+    options: Options!
+}
+
+type Options {
+    title: String
+    css: String
+    html: String
+    images: [Link]
+    filters: [FilterOption]
+    column_1: [ColumOption]
+    column_2: [ColumOption]
+    column_3: [ColumOption]
+}
+
+type Link {
+    title: String
+    link: String
+    image: String
+    imageUrl: String @rename(attribute: "image_url")
+}
+
+type ColumOption {
+    url: String
+    title: String
+    sortOrder: String @rename(attribute: "sort_order")
+}

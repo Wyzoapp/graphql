@@ -1,0 +1,57 @@
+# Customer\CustomerGroup Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    customerGroups (
+        input: FilterCustomerGroupInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [CustomerGroup!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Customer\\Models\\CustomerGroup"
+    )
+
+    customerGroup (id: ID @eq): CustomerGroup @find(model: "Wyzo\\Customer\\Models\\CustomerGroup")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createCustomerGroup(
+        input: CreateCustomerGroupInput! @spread
+    ): CustomerGroupResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\CustomerGroupMutation@store")
+
+    updateCustomerGroup(
+        id: ID!,
+        input: CreateCustomerGroupInput! @spread
+    ): CustomerGroupResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\CustomerGroupMutation@update")
+
+    deleteCustomerGroup(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\CustomerGroupMutation@delete")
+}
+
+input FilterCustomerGroupInput {
+    id: Int
+    name: String
+    code: String
+}
+
+input CreateCustomerGroupInput {
+    name: String!
+    code: String!
+}
+
+type CustomerGroupResponse {
+    success: Boolean!
+    message: String
+    customerGroup: CustomerGroup @rename(attribute: "customer_group")
+}
+
+type CustomerGroup {
+    id: ID!
+    code: String!
+    name: String!
+    isUserDefined: Boolean! @rename(attribute: "is_user_defined")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    customers: [Customer!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Customer\\Models\\Customer"
+    )
+}

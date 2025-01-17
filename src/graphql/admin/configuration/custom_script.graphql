@@ -1,0 +1,22 @@
+# Setting\Custom Script Related APIs
+extend type Mutation {
+    updateCustomScript(
+        input: CustomScriptInput! @spread
+    ): CustomScriptResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Configuration\\CustomScriptMutation@updateCustomScript")
+}
+
+input CustomScriptInput {
+    css: String!
+    javascript: String!
+}
+
+type CustomScriptResponse {
+    success: Boolean
+    message: String
+    customScripts: CustomScripts @rename(attribute: "custom_scripts")
+}
+
+type CustomScripts {
+    css: String
+    javascript: String
+}

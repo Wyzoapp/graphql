@@ -1,0 +1,29 @@
+# Setting\Config Related APIs
+extend type Query {
+    coreConfigs(
+        input: FilterCoreConfigInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [CoreConfig!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Core\\Models\\CoreConfig"
+    )
+
+    coreConfig(code: String! @eq): CoreConfig @find(model: "Wyzo\\Core\\Models\\CoreConfig")
+}
+
+input FilterCoreConfigInput {
+    id: ID
+    code: String
+    value: String
+    channelCode: String @rename(attribute: "channel_code")
+    localeCode: String @rename(attribute: "locale_code")
+}
+
+type CoreConfig {
+    id: ID!
+    code: String!
+    value: String!
+    channelCode: String @rename(attribute: "channel_code")
+    localeCode: String @rename(attribute: "locale_code")
+}

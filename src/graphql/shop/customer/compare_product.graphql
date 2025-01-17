@@ -1,0 +1,53 @@
+#Shop\Customer\CompareProduct Related APIs
+extend type Query @guard(with: ["api"]){
+    compareProducts (
+        input: FilterCompareProductsInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Customer\\CompareProductQuery")
+    ): [CompareProduct!] @paginate(
+        type: "PAGINATOR",
+        model: "Wyzo\\Customer\\Models\\CompareItem",
+        defaultCount: 10
+    )
+
+    compareProduct (
+        id: ID @eq
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Customer\\CompareProductQuery@getItem")
+    ): CompareProduct @find(model: "Wyzo\\Customer\\Models\\CompareItem")
+}
+
+extend type Mutation @guard(with: ["api"]) {
+    addToCompare(
+        productId: ID! @rename(attribute: "product_id")
+    ): CompareProductResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CompareMutation@store")
+
+    removeFromCompareProduct(
+        productId: ID! @rename(attribute: "product_id")
+    ): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CompareMutation@delete")
+
+    removeAllCompareProducts: StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CompareMutation@deleteAll")
+}
+
+type CompareProductResponse {
+    success: Boolean
+    message: String
+    compareProduct: CompareProduct
+    cart: Cart @field(resolver: "Wyzo\\Checkout\\Cart@getCart")
+}
+
+input FilterCompareProductsInput {
+    id: Int
+    productId: Int @rename(attribute: "product_id")
+    productName: String @rename(attribute: "product_name")
+    price: Float
+}
+
+type CompareProduct {
+    id: ID!
+    productId: ID! @rename(attribute: "product_id")
+    customerId: ID! @rename(attribute: "customer_id")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime! @rename(attribute: "updated_at")
+    product: Product! @belongsTo(relation: "product")
+    customer: Customer!
+    cart: Cart @field(resolver: "Wyzo\\Checkout\\Cart@getCart")
+}

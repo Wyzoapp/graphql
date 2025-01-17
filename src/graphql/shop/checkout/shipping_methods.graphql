@@ -1,0 +1,24 @@
+# Shop\Checkout\ShippingMethods Related API
+extend type Query {
+    shippingMethods: ShippingMethods @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CheckoutMutation@shippingMethods")
+}
+
+type ShippingMethods {
+    message: String
+    cart: Cart
+    shippingMethods: [ShippingMethod!] @rename(attribute: "shipping_methods")
+}
+
+type ShippingMethod {
+    title: String
+    methods: Methods
+}
+
+type Methods {
+    code: String
+    label: String
+    price: Float
+    formattedPrice: String @rename(attribute: "formatted_price")
+    basePrice: Float @rename(attribute: "base_price")
+    formattedBasePrice: String @rename(attribute: "formatted_base_price")
+}

@@ -1,0 +1,16 @@
+# Shop\Checkout\savePaymentMethod Related API
+extend type Mutation {
+    savePayment(
+        input: savePaymentMethodInput! @spread
+    ): PaymentResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CheckoutMutation@savePayment")
+}
+
+input savePaymentMethodInput {
+    method: String!
+}
+
+type PaymentResponse {
+    message: String
+    cart: Cart
+    jumpToSection: String @rename(attribute: "jump_to_section")
+}

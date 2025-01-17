@@ -1,0 +1,68 @@
+# Setting\TaxRate Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    taxRates(
+        input: FilterTaxRateInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\Setting\\FilterTaxRate")
+    ): [TaxRate!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Tax\\Models\\TaxRate"
+    )
+
+    taxRate(id: ID @eq): TaxRate @find(model: "Wyzo\\Tax\\Models\\TaxRate")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createTaxRate(
+        input: createTaxRateInput! @spread
+    ): TaxRateResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\TaxRateMutation@store")
+
+    updateTaxRate(
+        id: ID!,
+        input: createTaxRateInput! @spread
+    ): TaxRateResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\TaxRateMutation@update")
+
+    deleteTaxRate(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\TaxRateMutation@delete")
+}
+
+input FilterTaxRateInput {
+    id: Int
+    identifier: String
+    isZip: Int @rename(attribute: "is_zip")
+    zipCode: String @rename(attribute: "zip_code")
+    zipFrom: String @rename(attribute: "zip_from")
+    zipTo: String @rename(attribute: "zip_to")
+    state: String
+    country: String
+    taxRate: Float @rename(attribute: "tax_rate")
+}
+
+input createTaxRateInput {
+    identifier: String!
+    isZip: String @rename(attribute: "is_zip")
+    zipCode: String @rename(attribute: "zip_code")
+    zipFrom: String @rename(attribute: "zip_from")
+    zipTo: String @rename(attribute: "zip_to")
+    state: String!
+    country: String!
+    taxRate: Float! @rename(attribute: "tax_rate")
+}
+
+type TaxRateResponse {
+    success: Boolean!
+    message: String
+    taxRate: TaxRate @rename(attribute: "tax_rate")
+}
+
+type TaxRate {
+    id: ID!
+    identifier: String!
+    isZip: Int @rename(attribute: "is_zip")
+    zipCode: String @rename(attribute: "zip_code")
+    zipFrom: String @rename(attribute: "zip_from")
+    zipTo: String @rename(attribute: "zip_to")
+    state: String!
+    country: String!
+    taxRate: Float! @rename(attribute: "tax_rate")
+    taxCategories: [TaxCategory] @belongsToMany(relation: "tax_categories")
+}

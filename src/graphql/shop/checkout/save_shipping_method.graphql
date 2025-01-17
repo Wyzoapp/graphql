@@ -1,0 +1,16 @@
+# Shop\Checkout\saveShippingMethod Related API
+extend type Mutation {
+    saveShipping(
+        input: saveShippingMethodInput! @spread
+    ): ShippingResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CheckoutMutation@saveShipping")
+}
+
+input saveShippingMethodInput {
+    method: String!
+}
+
+type ShippingResponse {
+    message: String
+    cart: Cart
+    jumpToSection: String @rename(attribute: "jump_to_section")
+}

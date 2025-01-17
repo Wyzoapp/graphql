@@ -1,0 +1,69 @@
+# Setting\User\Role Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    roles(
+        input: FilterRoleInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [Role!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\User\\Models\\Role"
+    )
+
+    role(id: ID @eq): Role @find(model: "Wyzo\\User\\Models\\Role")
+
+    getAclPermissions: [AclPermissions] @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\RoleMutation@getAclPermissions")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createRole(
+        input: CreateRoleInput! @spread
+    ): RoleResponse  @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\RoleMutation@store")
+
+    updateRole(
+        id: ID!,
+        input: CreateRoleInput! @spread
+    ): RoleResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\RoleMutation@update")
+
+    deleteRole(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\RoleMutation@delete")
+}
+
+input FilterRoleInput {
+    id: ID
+    name: String
+    permissionType: String @rename(attribute: "permission_type")
+}
+
+input CreateRoleInput {
+    name: String!
+    description: String!
+    permissionType: PermissionType! @rename(attribute: "permission_type")   
+    permissions: [String!]
+}
+
+enum PermissionType {
+    CUSTOM @enum(value: "custom")
+    ALL @enum(value: "all")
+}
+
+type RoleResponse {
+    success: Boolean
+    message: String
+    role: Role
+}
+
+type Role {
+    id: ID!
+    name: String!
+    description: String!
+    permissionType: String! @rename(attribute: "permission_type")
+    permissions: [String!]
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+}
+
+type AclPermissions {
+    key: String!
+    name: String!
+    route: String
+    sort: Int!
+}

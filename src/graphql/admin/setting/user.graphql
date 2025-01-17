@@ -1,0 +1,81 @@
+# Setting\User Related APIs
+extend type Query @guard(with: ["admin-api"]){
+    users(
+        input: FilterUserInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\Setting\\FilterUser")
+    ): [User!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\User\\Models\\Admin"
+    )
+
+    user(id: ID @eq): User @find(model: "Wyzo\\User\\Models\\Admin")
+}
+
+extend type Mutation {
+    userLogin(
+        input: LoginInput! @spread
+    ): LoginResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\UserMutation@login")
+
+    userLogout: StatusResponse @guard(with: ["admin-api"]) @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\UserMutation@logout")
+
+    createUser(
+        input: CreateUserInput! @spread
+    ): UserResponse @guard(with: ["admin-api"]) @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\UserMutation@store")
+
+    updateUser(
+        id: ID!,
+        input: CreateUserInput! @spread
+    ): UserResponse @guard(with: ["admin-api"]) @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\UserMutation@update")
+
+    deleteUser(id: ID!): StatusResponse @guard(with: ["admin-api"]) @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\UserMutation@delete")
+}
+
+input FilterUserInput {
+    id: Int
+    name: String
+    email: String @rules(apply: ["email"])
+    roleId: Int @rename(attribute: "role_id")
+    role: String
+    status: Boolean
+}
+
+input CreateUserInput {
+    name: String!
+    email: String!
+    password: String
+    passwordConfirmation: String @rename(attribute: "password_confirmation")
+    roleId: Int! @rename(attribute: "role_id")
+    status: Boolean
+    image: String
+}
+
+type UserResponse {
+    success: Boolean!
+    message: String
+    user: User
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    password: String
+    apiToken: String @rename(attribute: "api_token")
+    status: Boolean
+    roleId: Int! @rename(attribute: "role_id")
+    image: String @rename(attribute: "image_url")
+    rememberToken: String @rename(attribute: "remember_token")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    role: Role! @belongsTo(relation: "role")
+}
+
+type LoginResponse {
+    success: Boolean
+    message: String
+    accessToken: String @rename(attribute: "access_token")
+    tokenType: String @rename(attribute: "token_type")
+    expiresIn: Int @rename(attribute: "expires_in")
+    user: User
+}

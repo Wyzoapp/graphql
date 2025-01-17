@@ -1,0 +1,56 @@
+#Marketing\EmailTemplate Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    emailTemplates(
+        input: FilterEmailTemplateInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [EmailTemplate!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Marketing\\Models\\Template"
+    )
+
+    emailTemplate(id: ID @eq): EmailTemplate @find(model: "Wyzo\\Marketing\\Models\\Template")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createEmailTemplate(
+        input: CreateEmailTemplateInput! @spread
+    ): EmailTemplateResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Marketing\\Communications\\EmailTemplateMutation@store")
+
+    updateEmailTemplate(
+        id: ID!,
+        input: CreateEmailTemplateInput! @spread
+    ): EmailTemplateResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Marketing\\Communications\\EmailTemplateMutation@update")
+
+    deleteEmailTemplate(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Marketing\\Communications\\EmailTemplateMutation@delete")
+}
+
+input FilterEmailTemplateInput {
+    id: ID
+    name: String
+}
+
+input CreateEmailTemplateInput {
+    name: String!
+    content: String!
+    status: Status!
+}
+
+enum Status {
+    ACTIVE @enum(value: "active")
+    INACTIVE @enum(value: "inactive")
+    DRAFT @enum(value: "draft")
+}
+
+type EmailTemplateResponse {
+    success: Boolean!
+    message: String!
+    emailTemplate: EmailTemplate @rename(attribute: "email_template")
+}
+
+type EmailTemplate {
+    id: ID!
+    content: String!
+    name: String!
+    status: String!
+}

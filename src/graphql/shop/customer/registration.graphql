@@ -1,0 +1,39 @@
+#Shop\Customer\Registration Related APIs
+extend type Mutation {
+    customerSignUp(
+        input: SignUpInput! @spread
+    ): CustomerLoginResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\RegistrationMutation@signUp")
+
+    customerSocialSignIn(
+        input: SocialSignInInput! @spread
+    ): CustomerLoginResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\RegistrationMutation@socialSignIn")
+}
+
+input SignUpInput {
+    firstName: String! @rename(attribute: "first_name")
+    lastName: String! @rename(attribute: "last_name")
+    email: String!
+    password: String!
+    passwordConfirmation: String! @rename(attribute: "password_confirmation")
+    subscribedToNewsLetter: Boolean @rename(attribute: "subscribed_to_news_letter")
+}
+
+input SocialSignInInput {
+    firstName: String @rename(attribute: "first_name")
+    lastName: String @rename(attribute: "last_name")
+    email: String
+    phone: String
+    signupType: SocialSignInType! @rename(attribute: "signup_type")
+    password: String
+    passwordConfirmation: String
+    remember: Boolean
+}
+
+enum SocialSignInType {
+    TRUECALLER @enum(value: "truecaller")
+    FACEBOOK @enum(value: "facebook")
+    TWITTER @enum(value: "twitter")
+    GOOGLE @enum(value: "google")
+    LINKEDIN @enum(value: "linkedin")
+    GITHUB @enum(value: "github")
+}

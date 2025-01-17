@@ -1,0 +1,69 @@
+# Setting\Currency Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    currencies(
+        input: FilterCurrencyInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [Currency!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Core\\Models\\Currency"
+    )
+
+    currency(id: ID @eq): Currency @find(model: "Wyzo\\Core\\Models\\Currency")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createCurrency(
+        input: CreateCurrencyInput! @spread
+    ): CurrencyResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\CurrencyMutation@store")
+
+    updateCurrency(
+        id: ID!,
+        input: CreateCurrencyInput! @spread
+    ): CurrencyResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\CurrencyMutation@update")
+
+    deleteCurrency(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\CurrencyMutation@delete")
+}
+
+input FilterCurrencyInput {
+    id: Int
+    name: String
+    code: String
+}
+
+input CreateCurrencyInput {
+    code: String!
+    name: String!
+    symbol: String
+    decimal: Int
+    groupSeparator: String @rename(attribute: "group_separator")
+    decimalSeparator: String @rename(attribute: "decimal_separator")
+    currencyPosition: currencyPosition @rename(attribute: "currency_position")
+}
+
+enum currencyPosition {
+    LEFT @enum(value: "left")
+    LEFT_WITH_SPACE @enum(value: "left_with_space")
+    RIGHT @enum(value: "right")
+    RIGHT_WITH_SPACE @enum(value: "right_with_space")
+}
+
+type CurrencyResponse {
+    success: Boolean
+    message: String
+    currency: Currency
+}
+
+type Currency {
+    id: ID!
+    code: String!
+    name: String!
+    symbol: String!
+    decimal: Int
+    groupSeparator: String @rename(attribute: "group_separator")
+    decimalSeparator: String @rename(attribute: "decimal_separator")
+    currencyPosition: String @rename(attribute: "currency_position")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    exchangeRate: ExchangeRate @hasOne(relation: "exchange_rate")
+}

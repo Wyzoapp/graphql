@@ -1,0 +1,59 @@
+# Shop\Common\HomePage Related APIs
+extend type Query {
+    getDefaultChannel: Channel @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getDefaultChannel")
+
+    themeCustomization: [ShopTheme!] @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getThemeCustomizationData")
+
+    homeCategories(
+        getCategoryTree: Boolean @rename (attribute: "get_category_tree")
+        input: [FilterHomeCategoriesInput]
+    ): [Category!] @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getCategories")
+
+    allProducts(
+        input: [FilterHomeCategoriesInput]
+    ): ProductPaginatorResponse! @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getAllProducts")
+
+    getFilterAttribute(
+        categorySlug: String! @rename (attribute: "category_slug")
+    ): FilterAttribute @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\HomePageQuery@getFilterAttributes")
+}
+
+input FilterHomeCategoriesInput {
+    key: String
+    value: String
+}
+
+type FilterAttribute {
+    minPrice: Float @rename(attribute: "min_price")
+    maxPrice: Float @rename(attribute: "max_price")
+    filterAttributes: [Attribute!] @rename(attribute: "filter_attributes")
+    filterData: [FilterAttributeDataList] @rename(attribute: "filter_data")
+    sortOrders: [CatalogSortOrder!] @rename(attribute: "sort_orders")
+}
+
+type ShopTheme {
+    id: ID!
+    themeCode: String @rename(attribute: "theme_code")
+    type: String
+    name: String
+    sortOrder: Int  @rename(attribute: "sort_order")
+    status: Boolean
+    channelId: ID @rename(attribute: "channel_id")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    translations: [ThemeTranslation!]
+}
+
+type FilterAttributeDataList {
+    key: String
+    value: [String]
+}
+
+type CatalogSortOrder {
+    key: String
+    title: String
+    value: String
+    sort: String
+    order: String
+    position: String
+}

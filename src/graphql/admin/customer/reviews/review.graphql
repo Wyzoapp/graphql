@@ -1,0 +1,64 @@
+# Customer\Review Related APIs
+extend type Query {
+    reviews(
+        input: FilterReviewInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [Review!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Product\\Models\\ProductReview"
+    )
+
+    review(id: ID @eq): Review @find(model: "Wyzo\\Product\\Models\\ProductReview")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    updateReview (
+        id: ID!,
+        status: ReviewStatus! @rules(apply: ["required"])
+    ): ReviewResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\ReviewMutation@update")
+
+    adminDeleteReview(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\ReviewMutation@delete")
+}
+
+input FilterReviewInput {
+    id: ID
+}
+
+enum ReviewStatus {
+    APPROVED @enum(value: "approved")
+    DISAPPROVED @enum(value: "disapproved")
+    PENDING @enum(value: "pending")
+}
+
+type ReviewResponse {
+    success: Boolean
+    message: String
+    review: Review
+}
+
+type Review {
+    id: ID!
+    name: String
+    title: String
+    rating: Int!
+    comment: String
+    status: String
+    productId: ID! @rename(attribute: "product_id")
+    customerId: ID @rename(attribute: "customer_id")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    customer: Customer
+    product: Product
+    images: [ReviewAttachment]
+}
+
+type ReviewAttachment {
+    id: ID
+    reviewId: ID @rename(attribute: "review_id")
+    type: String
+    mimeType: String @rename(attribute: "mime_type")
+    path: String
+    url: String
+    review: Review
+}

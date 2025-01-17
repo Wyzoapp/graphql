@@ -1,0 +1,35 @@
+# Shop\Checkout\saveCheckoutAddresses Related API
+extend type Mutation {
+    saveCheckoutAddresses(
+        input: SaveShippingAddressInput! @spread
+    ): ShippingMethodsResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CheckoutMutation@saveCartAddresses")
+}
+
+input SaveShippingAddressInput {
+    billing: CheckoutAddressInput
+    shipping: CheckoutAddressInput
+}
+
+input CheckoutAddressInput {
+    companyName: String @rename(attribute: "company_name")
+    firstName: String! @rename(attribute: "first_name")
+    lastName: String! @rename(attribute: "last_name")
+    email: String!
+    address: [String]!
+    country: String!
+    state: String!
+    city: String!
+    postcode: String!
+    phone: String!
+    useForShipping: Boolean @rename(attribute: "use_for_shipping")
+    saveAddress: Boolean @rename(attribute: "save_address")
+    defaultAddress: Boolean  @rename(attribute: "default_address")
+}
+
+type ShippingMethodsResponse {
+    message: String
+    cart: Cart
+    shippingMethods: [ShippingMethod!] @rename(attribute: "shipping_methods")
+    paymentMethods: [PaymentMethod!] @rename(attribute: "payment_methods")
+    jumpToSection: String @rename(attribute: "jump_to_section")
+}

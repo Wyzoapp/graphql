@@ -1,0 +1,208 @@
+# Shop\Cart\CartDetail Related APIs
+extend type Query {
+    cartDetail: Cart @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CartMutation@cart")
+
+    cartItems: [CartItem!] @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CartMutation@cartItems")
+}
+
+extend type Mutation {
+    addItemToCart(
+        input: AddItemToCartInput! @spread
+    ): CartItemResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CartMutation@store")
+
+    updateItemToCart(
+        input: UpdateItemToCartInput! @spread
+    ): CartItemResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CartMutation@update")
+
+    removeCartItem(
+        id: ID!
+    ): CartItemResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CartMutation@delete")
+
+    removeAllCartItem: StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CartMutation@deleteAll")
+
+    moveToWishlist(
+        id: ID!
+    ): CartItemResponse @guard(with: ["api"]) @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\CartMutation@moveToWishlist")
+}
+
+input AddItemToCartInput {
+    isBuyNow: Boolean @rename(attribute: "is_buy_now")
+    productId: ID! @rename(attribute: "product_id")
+    quantity: Int!
+
+    # Used in case of adding Grouped Product to Cart
+    selectedConfigurableOption: Int @rename(attribute: "selected_configurable_option")
+    superAttribute: [ConfigurableProductInput!] @rename(attribute: "super_attribute")
+
+    # Used in case of adding Grouped Product to Cart
+    qty: [GroupedProductInput!]
+
+    # Used in case of adding Downloadable Product to Cart
+    links: [Int!]
+
+    # Used in case of adding Bundled Product to Cart
+    bundleOptions: [BundledOptionsInput!] @rename(attribute: "bundle_options")
+}
+
+input ConfigurableProductInput {
+    attributeId: Int! @rename(attribute: "attribute_id")
+    attributeOptionId: Int! @rename(attribute: "attribute_option_id")
+}
+
+input GroupedProductInput {
+    productId: Int! @rename(attribute: "product_id")
+    quantity: Int!
+}
+
+input BundledOptionsInput {
+    bundleOptionId: Int! @rename(attribute: "bundle_option_id")
+    bundleOptionProductId: [Int!] @rename(attribute: "bundle_option_product_id")
+    qty: Int
+}
+
+input UpdateItemToCartInput {
+    qty: [UpdateItemsQty!]
+}
+
+input UpdateItemsQty {
+    cartItemId: ID! @rename(attribute: "cart_item_id")
+    quantity: Int!
+}
+
+type CartItemResponse {
+    success: Boolean
+    message: String
+    cart: Cart
+}
+
+type Cart {
+    id: ID!
+    customerEmail: String @rename(attribute: "customer_email")
+    customerFirstName: String @rename(attribute: "customer_first_name")
+    customerLastName: String @rename(attribute: "customer_last_name")
+    shippingMethod: String @rename(attribute: "shipping_method")
+    couponCode: String @rename(attribute: "coupon_code")
+    isGift: Boolean! @rename(attribute: "is_gift")
+    itemsCount: Int @rename(attribute: "items_count")
+    itemsQty: Int @rename(attribute: "items_qty")
+    exchangeRate: Float @rename(attribute: "exchange_rate")
+    globalCurrencyCode: String @rename(attribute: "global_currency_code")
+    baseCurrencyCode: String @rename(attribute: "base_currency_code")
+    channelCurrencyCode: String @rename(attribute: "channel_currency_code")
+    cartCurrencyCode: String @rename(attribute: "cart_currency_code")
+    grandTotal: Float @rename(attribute: "grand_total")
+    baseGrandTotal: Float @rename(attribute: "base_grand_total")
+    subTotal: Float @rename(attribute: "sub_total")
+    baseSubTotal: Float @rename(attribute: "base_sub_total")
+    taxTotal: Float @rename(attribute: "tax_total")
+    baseTaxTotal: Float @rename(attribute: "base_tax_total")
+    discountAmount: Float @rename(attribute: "discount_amount")
+    baseDiscountAmount: Float @rename(attribute: "base_discount_amount")
+    shippingAmount: Float @rename(attribute: "shipping_amount")
+    baseShippingAmount: Float @rename(attribute: "base_shipping_amount")
+    shippingAmountInclTax: Float @rename(attribute: "shipping_amount_incl_tax")
+    baseShippingAmountInclTax: Float @rename(attribute: "base_shipping_amount_incl_tax")
+    subTotalInclTax: Float @rename(attribute: "sub_total_incl_tax")
+    baseSubTotalInclTax: Float @rename(attribute: "base_sub_total_incl_tax")
+    checkoutMethod: String @rename(attribute: "checkout_method")
+    isGuest: Boolean @rename(attribute: "is_guest")
+    isActive: Boolean @rename(attribute: "is_active")
+    appliedCartRuleIds: String @rename(attribute: "applied_cart_rule_ids")
+    customerId: ID @rename(attribute: "customer_id")
+    channelId: ID! @rename(attribute: "channel_id")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    appliedTaxRates: [AppliedTaxRate] @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\TaxQuery@appliedTaxRates")
+    formattedPrice: FormattedPrice @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\FormattedPrice@getCartPriceData")
+    items: [CartItem!] @hasMany
+    allItems: [CartItem!] @hasMany(relation: "all_items")
+    billingAddress: Address @rename(attribute: "billing_address")
+    shippingAddress: Address @rename(attribute: "shipping_address")
+    selectedShippingRate: CartShippingRate @rename(attribute: "selected_shipping_rate")
+    payment: CartPayment @hasOne
+    status: Boolean
+    message: String
+}
+
+type CartItem {
+    id: ID!
+    quantity: Int!
+    sku: String
+    type: String
+    name: String
+    couponCode: String @rename(attribute: "coupon_code")
+    weight: Float!
+    totalWeight: Float! @rename(attribute: "total_weight")
+    baseTotalWeight:Float! @rename(attribute: "base_total_weight")
+    price: Float!
+    basePrice: Float! @rename(attribute: "base_price")
+    customPrice: Float @rename(attribute: "custom_price")
+    total: Float!
+    baseTotal: Float! @rename(attribute: "base_total")
+    taxPercent:Float @rename(attribute: "tax_percent")
+    taxAmount:Float @rename(attribute: "tax_amount")
+    baseTaxAmount: Float @rename(attribute: "base_tax_amount")
+    discountPercent: Float! @rename(attribute: "discount_percent")
+    discountAmount:Float! @rename(attribute: "discount_amount")
+    baseDiscountAmount:Float! @rename(attribute: "base_discount_amount")
+    priceInclTax: Float @rename(attribute: "price_incl_tax")
+    basePriceInclTax: Float @rename(attribute: "base_price_incl_tax")
+    totalInclTax: Float @rename(attribute: "total_incl_tax")
+    baseTotalInclTax: Float @rename(attribute: "base_total_incl_tax")
+    appliedTaxRate: String @rename(attribute: "applied_tax_rate")
+    parentId: ID @rename(attribute: "parent_id")
+    productId: ID! @rename(attribute: "product_id")
+    cartId: ID! @rename(attribute: "cart_id")
+    taxCategoryId: ID @rename(attribute: "tax_category_id")
+    appliedCartRuleIds: String @rename(attribute: "applied_cart_rule_ids")
+    additional: ItemAdditional @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\FilterItem@additional")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")    
+    formattedPrice: FormattedPrice @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\FormattedPrice@getCartItemPriceData")
+    product: Product! @hasOne
+    cart: Cart @hasOne
+    child: CartItem @belongsTo(relation: "child")
+    parent: CartItem @belongsTo(relation: "parent")
+}
+
+type AppliedTaxRate {
+    taxName: String @rename(attribute: "tax_name")
+    totalAmount: String @rename(attribute: "total_amount")
+}
+
+type AdditionalSuperAttributes {
+    attributeId: ID @rename(attribute: "attribute_id")
+    optionId: ID @rename(attribute: "option_id")
+}
+
+type AdditionalAttributes {
+    optionId: ID @rename(attribute: "option_id")
+    optionLabel: String @rename(attribute: "option_label")
+    attributeCode: String @rename(attribute: "attribute_code")
+    attributeName: String @rename(attribute: "attribute_name")
+}
+
+type CartShippingRate {
+    id: ID!
+    carrier: String!
+    carrierTitle: String! @rename(attribute: "carrier_title")
+    method: String!
+    methodTitle: String! @rename(attribute: "method_title")
+    methodDescription: String @rename(attribute: "method_description")
+    price: Float
+    basePrice: Float @rename(attribute: "base_price")
+    discountAmount: Float @rename(attribute: "discount_amount")
+    baseDiscountAmount: Float @rename(attribute: "base_discount_amount")
+    taxPercent: Float @rename(attribute: "tax_percent")
+    taxAmount: Float @rename(attribute: "tax_amount")
+    baseTaxAmount: Float @rename(attribute: "base_tax_amount")
+    priceInclTax: Float @rename(attribute: "price_incl_tax")
+    basePriceInclTax: Float @rename(attribute: "base_price_incl_tax")
+    appliedTaxRate: String @rename(attribute: "applied_tax_rate")
+    isCalculateTax: Boolean @rename(attribute: "is_calculate_tax")
+    cartAddressId: ID @rename(attribute: "cart_address_id")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    shippingAddress: Address @belongsTo(relation: "shipping_address")
+    formattedPrice: FormattedPrice @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\FormattedPrice@getCartShippingRatePriceData")
+}

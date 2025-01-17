@@ -1,0 +1,68 @@
+#Shop\Customer\Downloadable Related APIs
+extend type Query @guard(with: ["api"]){
+    downloadableLinkPurchases(
+        input: FilterDownloadablePurchaseInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Customer\\DownloadableQuery")
+    ): [DownloadableLinkPurchased!] @paginate(
+        type: "PAGINATOR",
+        model: "Wyzo\\Sales\\Models\\DownloadableLinkPurchased",
+        defaultCount: 10
+    )
+
+    downloadableLinkPurchase(
+        id: ID @eq
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Customer\\DownloadableQuery@getDetails")
+    ): DownloadableLinkPurchased @find(model: "Wyzo\\Sales\\Models\\DownloadableLinkPurchased")
+}
+
+extend type Mutation @guard(with: ["api"]) {
+    downloadLink(id: ID!): DownloadLinkResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\DownloadableMutation@download")
+}
+
+input FilterDownloadablePurchaseInput {
+    id: Int
+    orderId: Int @rename(attribute: "order_id")
+    orderItemId: Int @rename(attribute: "order_item_id")
+    productName: String @rename(attribute: "product_name")
+    name: String
+    status: DownloadLinkStatusEnum
+    downloadBought: Int @rename(attribute: "download_bought")
+    downloadUsed: Int @rename(attribute: "download_used")
+    purchaseDate: String @rename(attribute: "purchase_date")
+    purchaseDateFrom: String @rename(attribute: "purchase_date_from")
+    purchaseDateTo: String @rename(attribute: "purchase_date_to")
+}
+
+type DownloadableLinkPurchased {
+    id: ID!
+    productName: String @rename(attribute: "product_name")
+    name: String
+    url: String
+    file: String
+    fileName: String @rename(attribute: "file_name")
+    type: String!
+    downloadBought: Int! @rename(attribute: "download_bought")
+    downloadUsed: Int! @rename(attribute: "download_used")
+    status: Boolean
+    customerId: ID! @rename(attribute: "customer_id")
+    orderId: ID! @rename(attribute: "order_id")
+    orderItemId: ID! @rename(attribute: "order_item_id")
+    downloadCanceled: Int @rename(attribute: "download_canceled")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    customer: Customer @belongsTo(relation: "customer")
+    order: Order! @belongsTo(relation: "order")
+    orderItem: OrderItem @belongsTo(relation: "order_item")
+}
+
+type DownloadLinkResponse {
+    success: Boolean
+    string: String
+    download: DownloadableLinkPurchased
+}
+
+enum DownloadLinkStatusEnum {
+    PENDING @enum(value: "pending")
+    AVAILABLE @enum(value: "available")
+    EXPIRED @enum(value: "expired")
+}

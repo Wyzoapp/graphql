@@ -1,0 +1,55 @@
+# Setting\Exchange Rate Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    exchangeRates(
+        input: FilterExchangeRateInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\Setting\\FilterExchangeRate")
+    ): [ExchangeRate!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Core\\models\\CurrencyExchangeRate"
+    )
+
+    exchangeRate(id: ID @eq): ExchangeRate @find(model: "Wyzo\\Core\\models\\CurrencyExchangeRate")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createExchangeRate(
+        input: CreateExchangeRateInput! @spread
+    ): ExchangeRateResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\ExchangeRateMutation@store")
+
+    updateExchangeRate(
+        id: ID!,
+        input: CreateExchangeRateInput! @spread
+    ): ExchangeRateResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\ExchangeRateMutation@update")
+
+    deleteExchangeRate(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\ExchangeRateMutation@delete")
+
+    updateExchangeRates: StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Setting\\ExchangeRateMutation@updateExchangeRates")
+}
+
+input FilterExchangeRateInput {
+    id: Int
+    targetCurrency: Int @rename(attribute: "target_currency")
+    currency: String
+    rate: Float
+}
+
+input CreateExchangeRateInput {
+    targetCurrency: Int! @rename(attribute: "target_currency")
+    rate: Float!
+}
+
+type ExchangeRateResponse {
+    success: Boolean
+    message: String
+    exchangeRate: ExchangeRate @rename(attribute: "exchange_rate")
+}
+
+type ExchangeRate {
+    id: ID!
+    rate: Float!
+    targetCurrency: Int! @rename(attribute: "target_currency")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    currency: Currency! @belongsTo
+}

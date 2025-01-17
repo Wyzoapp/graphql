@@ -1,0 +1,30 @@
+#Shop\Customer\Account Related APIs
+extend type Query @guard(with: ["api"]) {
+    accountInfo: Customer @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Customer\\CustomerQuery@get")
+}
+
+extend type Mutation {
+    updateAccount(
+        input: UpdateAccountInput! @spread
+    ): CustomerResponse @guard(with: ["api"]) @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\AccountMutation@update")
+
+    deleteAccount(
+        password: String!
+    ): StatusResponse @guard(with: ["api"]) @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\AccountMutation@delete")
+}
+
+input UpdateAccountInput {
+    firstName: String! @rename(attribute: "first_name")
+    lastName: String! @rename(attribute: "last_name")
+    email: String!
+    phone: String!
+    gender: Gender!
+    dateOfBirth: String @rename(attribute: "date_of_birth")
+    currentPassword: String @rename(attribute: "current_password")
+    newPassword: String @rename(attribute: "new_password")
+    newPasswordConfirmation: String @rename(attribute: "new_password_confirmation")
+    newsletterSubscriber: Boolean @rename(attribute: "subscribed_to_news_letter")
+    uploadType: UploadType @rename(attribute: "upload_type")
+    imageUrl: String @rename(attribute: "image_url")
+    image: Upload
+}

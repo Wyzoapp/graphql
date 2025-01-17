@@ -1,0 +1,124 @@
+# Seles\Shipment Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    shipments(
+        input: FilterShipmentInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\Sales\\Shipments\\FilterShipment")
+    ): [Shipment!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Sales\\Models\\Shipment"
+    )
+
+    shipment(id: ID @eq): Shipment @find(model: "Wyzo\\Sales\\Models\\Shipment")
+
+    shipmentItems(
+        input: FilterShipmentItemInput!
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [ShipmentItem!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Sales\\Models\\ShipmentItem"
+    )
+
+    shipmentItem(
+        id: ID @eq,
+        input: FilterShipmentItemInput!
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): ShipmentItem @find(model: "Wyzo\\Sales\\Models\\ShipmentItem")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createShipment(
+        input: CreateShipmentInput! @spread
+    ): ShipmentResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Sales\\Shipments\\ShipmentMutation@store")
+}
+
+input FilterShipmentInput {
+    id: Int
+    totalQty: Int @rename(attribute: "total_qty")
+    orderId: Int @rename(attribute: "order_id")
+    orderDate: String @rename(attribute: "order_date")
+    shipment_date: String @rename(attribute: "shipment_date")
+    inventorySource: String @rename(attribute: "inventory_source")
+    shippingTo: String @rename(attribute: "shipping_to")
+}
+
+input FilterShipmentItemInput {
+    shipmentId: ID! @rename(attribute: "shipment_id")
+    id: Int
+    name: String
+    sku: String
+    qty: Int
+    weight: Float
+    price: Float
+    orderItemId: Int @rename(attribute: "order_item_id")
+}
+
+input CreateShipmentInput {
+    orderId: Int! @rename(attribute: "order_id")
+    carrierTitle: String! @rename(attribute: "carrier_title")
+    trackNumber: String! @rename(attribute: "track_number")
+    inventorySourceId: Int! @rename(attribute: "inventory_source_id")
+    shipmentData: [ShipmentDataInput!]! @rename(attribute: "shipment_data")
+}
+
+input ShipmentDataInput {
+    orderItemId: Int! @rename(attribute: "order_item_id")
+    quantity: Int!
+}
+
+type ShipmentResponse {
+    success: Boolean
+    message: String
+    shipment: Shipment
+}
+
+type Shipment {
+    id: Int
+    status: String
+    totalQty: Int @rename(attribute: "total_qty")
+    totalWeight: Float @rename(attribute: "total_weight")
+    carrierCode: String @rename(attribute: "carrier_code")
+    carrierTitle: String @rename(attribute: "carrier_title")
+    trackNumber: String @rename(attribute: "track_number")
+    emailSent: Int @rename(attribute: "email_sent")
+    customerId: Int @rename(attribute: "customer_id")
+    customerType: String @rename(attribute: "customer_type")
+    orderId: Int @rename(attribute: "order_id")
+    orderAddressId: Int @rename(attribute: "order_address_id")
+    inventorySourceId: Int @rename(attribute: "inventory_source_id")
+    inventorySourceName: String @rename(attribute: "inventory_source_name")
+    createdAt: String @rename(attribute: "created_at")
+    updatedAt: String @rename(attribute: "updated_at")
+    order: Order! @belongsTo
+    items: [ShipmentItem!] @hasMany
+    inventorySource: InventorySource! @belongsTo(relation: "inventory_source")
+    customer: Customer @belongsTo(relation: "customer")
+    address: Address @belongsTo(relation: "address")
+}
+
+type ShipmentItem {
+    id: Int!
+    name: String
+    description: String
+    sku: String
+    qty: Int
+    weight: Float
+    price: Float
+    basePrice: Float @rename(attribute: "base_price")
+    total: Float
+    baseTotal: Float @rename(attribute: "base_total")
+    priceInclTax: Float @rename(attribute: "price_incl_tax")
+    basePriceInclTax: Float @rename(attribute: "base_price_incl_tax")
+    formattedPrice: FormattedPrice @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Sales\\FormattedPrice@getShipmentItemPriceData")
+    productId: ID! @rename(attribute: "product_id")
+    productType: String @rename(attribute: "product_type")
+    orderItemId: ID! @rename(attribute: "order_item_id")
+    shipmentId: ID! @rename(attribute: "shipment_id")
+    additional: ItemAdditional @field(resolver: "Wyzo\\GraphQLAPI\\Queries\\Shop\\Common\\FilterItem@additional")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    shipment: Shipment! @belongsTo(relation: "shipment")
+    orderItem: OrderItem! @belongsTo(relation: "order_item")
+    product: Product! @belongsTo(relation: "product")
+}

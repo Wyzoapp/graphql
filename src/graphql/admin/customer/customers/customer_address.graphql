@@ -1,0 +1,63 @@
+# Customer\CustomerAddress Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    customerAddresses(
+        input: FilterCustomerAddressInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [Address!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Customer\\Models\\CustomerAddress"
+    )
+
+    customerAddress(id: ID @eq): Address @find(model: "Wyzo\\Customer\\Models\\CustomerAddress")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createCustomerAddress(
+        input: CreateCustomerAddressInput! @spread
+    ): AddressResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\CustomerAddressMutation@store")
+
+    updateCustomerAddress(
+        id: ID!,
+        input: CreateCustomerAddressInput! @spread
+    ): AddressResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\CustomerAddressMutation@update")
+
+    setAsDefaultAddress(
+        id: ID!
+        customerId: ID! @rename(attribute: "customer_id")
+    ): AddressResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\CustomerAddressMutation@setAsDefaultAddress")
+
+    deleteCustomerAddress(id: ID!): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Customer\\CustomerAddressMutation@delete")
+}
+
+input FilterCustomerAddressInput {
+    id: Int
+    customerId: Int @rename(attribute: "customer_id")
+    companyName: String @rename(attribute: "company_name")
+    firstName: String @rename(attribute: "first_name")
+    lastName: String @rename(attribute: "last_name")
+    address: String
+    country: String
+    state: String
+    city: String
+    postcode: String
+    phone: String
+    vatId: String @rename(attribute: "vat_id")
+    defaultAddress: Boolean @rename(attribute: "default_address")
+}
+
+input CreateCustomerAddressInput {
+    customerId: Int! @rename(attribute: "customer_id")
+    companyName: String @rename(attribute: "company_name")
+    vatId: String @rename(attribute: "vat_id")
+    firstName: String! @rename(attribute: "first_name")
+    lastName: String! @rename(attribute: "last_name")
+    address: String!
+    city: String!
+    postcode: String!
+    country: String!
+    state: String!
+    phone: String!
+    email: String!
+    defaultAddress: Boolean @rename(attribute: "default_address")
+}

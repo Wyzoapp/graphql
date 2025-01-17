@@ -1,0 +1,8 @@
+#Shop\Customer\Session Related APIs
+extend type Mutation {
+    customerLogin(
+        input: LoginInput! @spread
+    ): CustomerLoginResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\SessionMutation@login")
+
+    customerLogout: StatusResponse @guard(with: ["api"]) @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Shop\\Customer\\SessionMutation@logout")
+}

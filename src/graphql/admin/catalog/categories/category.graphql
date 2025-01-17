@@ -1,0 +1,98 @@
+# Catalog\Category Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    categories(
+        input: FilterCategoryListInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\Catalog\\Categories\\FilterCategory")
+    ): [Category!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Category\\Models\\Category"
+    )
+
+    category(id: ID @eq): Category @find(model: "Wyzo\\Category\\Models\\Category")
+}
+
+extend type Mutation @guard(with: ["admin-api"]) {
+    createCategory(
+        input: CreateCategoryInput! @spread
+    ): CategoryResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Catalog\\Categories\\CategoryMutation@store")
+
+    updateCategory(
+        id: ID!,
+        input: CreateCategoryInput! @spread
+    ): CategoryResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Catalog\\Categories\\CategoryMutation@update")
+
+    deleteCategory(
+        id: ID!
+    ): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Catalog\\Categories\\CategoryMutation@delete")
+}
+
+input CreateCategoryInput {
+    locale: String
+    name: String
+    slug: String
+    description: String
+    status: Boolean
+    position: Int
+    displayMode: String @rename(attribute: "display_mode")
+    logoPath: [String] @rename(attribute: "logo_path")
+    bannerPath: [String] @rename(attribute: "banner_path")
+    parentId: Int @rename(attribute: "parent_id")
+    metaTitle: String @rename(attribute: "meta_title")
+    metaDescription: String @rename(attribute: "meta_description")
+    metaKeywords: String @rename(attribute: "meta_keywords")
+    attributes: [String]
+}
+
+input FilterCategoryListInput {
+    id: Int
+    slug: String
+    name: String
+    status: Boolean
+    position: Int
+}
+
+type CategoryResponse {
+    success: Boolean!
+    message: String!
+    category: Category
+}
+
+type Category {
+    id: ID!
+    position: Int
+    logoPath: String @rename(attribute: "logo_path")
+    logoUrl: String @rename(attribute: "logo_url")
+    status: Boolean
+    displayMode: String! @rename(attribute: "display_mode")
+    lft: Int @rename(attribute: "_lft")
+    rgt: Int @rename(attribute: "_rgt")
+    parentId: ID @rename(attribute: "parent_id")
+    additional: String
+    bannerPath: String @rename(attribute: "banner_path")
+    bannerUrl: String @rename(attribute: "banner_url")
+    name: String!
+    slug: String!
+    urlPath: String @rename(attribute: "url_path")
+    description: String!
+    metaTitle: String @rename(attribute: "meta_title")
+    metaDescription: String @rename(attribute: "meta_description")
+    metaKeywords: String @rename(attribute: "meta_keywords")
+    localeId: Int @rename(attribute: "locale_id")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+    filterableAttributes: [filterableAttributes!] @belongsToMany
+    children: [Category!] @hasMany
+}
+
+type filterableAttributes {
+    id: ID!
+    code: String!
+    adminName: String! @rename(attribute: "admin_name")
+    type: String!
+    validation: String
+    position: Int
+    isFilterable: Int @rename(attribute: "is_filterable")
+    category: Category! @belongsTo(relation: "category")
+    options: [AttributeOption!] @hasMany
+}

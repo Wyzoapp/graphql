@@ -1,0 +1,52 @@
+# Setting\Country Related APIs
+extend type Query {
+    countries: [Country!] @all(model: "Wyzo\\Core\\Models\\Country")
+
+    country(id: ID! @eq): Country @find(model: "Wyzo\\Core\\Models\\Country")
+
+    countrieStates(
+        input: FilterCountryStateInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [CountryState!] @all(model: "Wyzo\\Core\\Models\\CountryState")
+
+    countrieState(id: ID! @eq): CountryState @find(model: "Wyzo\\Core\\Models\\CountryState")
+}
+
+input FilterCountryStateInput {
+    id: Int
+    defaultName: String @rename(attribute: "default_name")
+    code: String
+    countryId: ID @rename(attribute: "country_id")
+    countryCode: String @rename(attribute: "country_code")
+}
+
+type Country {
+    id: ID!
+    code: String!
+    name: String!
+    translations: [CountryTranslation!] @hasMany
+    states: [CountryState] @hasMany
+}
+
+type CountryTranslation {
+    id: ID!
+    locale: String!
+    name: String
+    countryId: ID! @rename(attribute: "country_id")
+}
+
+type CountryState {
+    id: ID!
+    countryCode: String! @rename(attribute: "country_code")
+    code: String!
+    defaultName: String @rename(attribute: "default_name")
+    countryId: ID! @rename(attribute: "country_id")
+    translations: [CountryStateTranslation!] @hasMany
+}
+
+type CountryStateTranslation {
+    id: ID!
+    locale: String!
+    defaultName: String @rename(attribute: "default_name")
+    countryStateId: ID! @rename(attribute: "country_state_id")
+}

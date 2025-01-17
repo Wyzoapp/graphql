@@ -1,0 +1,46 @@
+# Customer\NewsletterSubscribers Related APIs
+extend type Query @guard(with: ["admin-api"]) {
+    getSubscribers(
+        input: FilterSubscriberInput
+        @builder(method: "Wyzo\\GraphQLAPI\\Queries\\Admin\\CommonFilter")
+    ): [Subscriber!] @paginate(
+        type: "PAGINATOR"
+        defaultCount: 10
+        model: "Wyzo\\Core\\Models\\SubscribersList"
+    )
+
+    getSubscriber(id: ID @eq): Subscriber @find(model: "Wyzo\\Core\\Models\\SubscribersList")
+}
+
+extend type Mutation {
+    unSubscribe(
+        id: ID! @rules(apply: ["required"])
+    ): SubscriberResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Marketing\\Communications\\NewsletterSubscriberMutation@unSubscribe")
+
+    deleteSubscriber(
+        id: ID! @rules(apply: ["required"])
+    ): StatusResponse @field(resolver: "Wyzo\\GraphQLAPI\\Mutations\\Admin\\Marketing\\Communications\\NewsletterSubscriberMutation@delete")
+}
+
+input FilterSubscriberInput {
+    id: ID
+    email: String
+    isSubscribed: Boolean @rename(attribute: "is_subscribed")
+}
+
+type SubscriberResponse {
+    success: Boolean
+    message: String
+    subscriber: Subscriber
+}
+
+type Subscriber {
+    id: ID!
+    email: String!
+    isSubscribed: Boolean @rename(attribute: "is_subscribed")
+    token: String
+    customerId: Int @rename(attribute: "customer_id")
+    channelId: Int! @rename(attribute: "channel_id")
+    createdAt: DateTime @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+}
