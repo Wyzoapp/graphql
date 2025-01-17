@@ -1,11 +1,11 @@
 {
-    "name": "bagisto/graphql-api",
-    "description": "Bagisto GraphQL API",
+    "name": "wyzo/graphql-api",
+    "description": "Wyzo GraphQL API",
     "license": "MIT",
     "authors": [
         {
-            "name": "Vivek Sharma",
-            "email": "viveksh047@webkul.in"
+            "name": "Wyzo",
+            "email": "info@wyzo.app"
         }
     ],
     "require": {
@@ -15,13 +15,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Webkul\\GraphQLAPI\\": "src/"
+            "Wyzo\\GraphQLAPI\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Webkul\\GraphQLAPI\\Providers\\GraphQLAPIServiceProvider"
+                "Wyzo\\GraphQLAPI\\Providers\\GraphQLAPIServiceProvider"
             ],
             "aliases": {}
         }
