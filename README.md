@@ -1,52 +1,19 @@
-# Bagisto GraphQL API
+# Wyzo GraphQL API
 
-<p align="center">
-   <a href="https://packagist.org/packages/bagisto/graphql-api">
-      <img
-         src="https://poser.pugx.org/bagisto/graphql-api/d/total.svg"
-         alt="Total Downloads"
-      >
-   </a>
-
-   <a href="https://packagist.org/packages/bagisto/graphql-api">
-      <img
-         src="https://poser.pugx.org/bagisto/graphql-api/v/stable.svg"
-         alt="Latest Stable Version"
-      >
-   </a>
-
-   <a href="https://packagist.org/packages/bagisto/graphql-api">
-      <img
-         src="https://poser.pugx.org/bagisto/graphql-api/license.svg"
-         alt="License"
-      >
-   </a>
-</p>
-
-Bagisto's GraphQL API enables a seamless, headless eCommerce experience built on Laravel. This API delivers ultra-fast, dynamic, and personalized shopping experiences through a scalable, open-source platform.
-
-**Read our full documentation: [Bagisto GraphQL API Docs](https://devdocs.bagisto.com/2.2/api/graphql-api.html)**
-
-This API was developed in collaboration with the <a href="https://www.ucraft.com/">Ucraft Team</a>.
-
----
-
-### Requirements:
-
-- **Bagisto**: v2.2.2 or higher
+Wyzo GraphQL API enables a seamless, headless eCommerce experience built on Laravel. This API delivers ultra-fast, dynamic, and personalized shopping experiences through a scalable, open-source platform.
 
 ---
 
 ### Installation:
 
-To install the Bagisto GraphQL API, follow these steps:
+To install the Wyzo GraphQL API, follow these steps:
 
 1. **Install via Composer**
 
    Run the following command in your terminal to install the GraphQL API package:
 
    ```bash
-   composer require bagisto/graphql-api dev-main
+   composer require wyzo/graphql-api dev-main
    ```
 
 2. **Update Middleware Configuration**
@@ -69,10 +36,10 @@ To install the Bagisto GraphQL API, follow these steps:
 
 4. **Publish Assets and Configurations**
 
-   Run the command below to publish assets and configurations for Bagisto GraphQL:
+   Run the command below to publish assets and configurations for wyzo GraphQL:
 
    ```bash
-   php artisan bagisto-graphql:install
+   php artisan wyzo-graphql:install
    ```
 
 ---
@@ -94,7 +61,3 @@ To install the Bagisto GraphQL API, follow these steps:
    ```
    http://your-domain.com/graphql
    ```
-
----
-
-That's it! Your Bagisto GraphQL API is now ready. Execute the project on your specified domain and start building your headless eCommerce solution.
