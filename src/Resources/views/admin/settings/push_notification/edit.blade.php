@@ -203,7 +203,7 @@
                                         :value="old('content') ?: $notificationTranslation?->content"
                                         :label="trans('wyzo_graphql::app.admin.settings.notification.edit.notification-content')"
                                         rules="required"
-                                        :tinymce="true"
+                                        :tinymce="false"
                                     />
 
                                     <x-admin::form.control-group.error control-name="content" />
